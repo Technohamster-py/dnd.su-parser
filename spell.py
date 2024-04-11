@@ -63,7 +63,7 @@ class Spell:
             os.makedirs(f"{os.getcwd()}/downloads/spells")
         full_path = f"{os.getcwd()}/downloads/spells/{file_name}"
 
-        root = etree.Element('spell')
+        root = etree.Element('spell', sourse=self.source)
 
         title = etree.SubElement(root, 'title').text = self.title
         level = etree.SubElement(root, 'level').text = self.level
