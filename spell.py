@@ -1,6 +1,7 @@
 import os
 from bs4 import BeautifulSoup
 import requests
+from lxml import etree
 
 
 class Spell:
@@ -49,11 +50,11 @@ class Spell:
 
         self.duration = card_content[4].text.split('/strong>')[1]
 
-        self.classes = card_content[5].text.split('/strong>')[1]
+        self.classes = [i for i in card_content[5].text.split('/strong>')[1].split(',')]
 
         self.source = card_content[6].text.split('/strong>')[1]
 
-        self.description = card_content[7].text.split('/strong>')[1]
+        self.description = card_content[7].text
 
     def save_to_file(self, file_name=""):
         if file_name == "":
@@ -61,3 +62,28 @@ class Spell:
         if not os.path.exists(f"{os.getcwd()}/downloads/spells"):
             os.makedirs(f"{os.getcwd()}/downloads/spells")
         full_path = f"{os.getcwd()}/downloads/spells/{file_name}"
+
+        root = etree.Element('spell')
+
+        title = etree.SubElement(root, 'title').text = self.title
+        level = etree.SubElement(root, 'level').text = self.level
+        school = etree.SubElement(root, 'school').text = self.school
+
+        classes = etree.SubElement(root, 'classes')
+        for cls in self.classes:
+            etree.SubElement(classes, 'class').text = cls
+
+        range_element = etree.SubElement(root, 'range').text = self.range
+        casting_time = etree.SubElement(root, 'casting-time').text = self.time
+        duration = etree.SubElement(root, 'duration').text = self.duration
+
+        components = etree.SubElement(root, 'components')
+        verbal = etree.SubElement(components, 'verbal').text = self.components['verbal']
+        somatic = etree.SubElement(components, 'somatic').text = self.components['somatic']
+        material = etree.SubElement(components, 'material').text = self.components['material']
+
+        description = etree.SubElement(components, 'description').text = self.description
+
+        tree = etree.ElementTree(root)
+
+        tree.write(full_path, xml_declaration=False, encoding='utf-8')
